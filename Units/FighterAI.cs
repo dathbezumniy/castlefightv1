@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using UnityEngine.AI;
+using Pathfinding;
+
 
 public enum FighterState
 {
@@ -16,6 +17,15 @@ public class FighterAI : Unit
     public Transform enemyCastle;
     public Transform Target { get; private set; }
     public StateMachine StateMachine => GetComponent<StateMachine>();
+    public Health Health => GetComponent<Health>();
+
+    private Seeker Seeker => GetComponent<Seeker>();
+    private CharacterController CharController => GetComponent<CharacterController>();
+    public Path path;
+    public float nextWaypointDistance = 1;
+    private int currentWaypoint = 0;
+    public bool reachedEndOfPath;
+
 
     protected void InitializeStateMachine()
     {
@@ -32,12 +42,85 @@ public class FighterAI : Unit
     public void SetTarget(Transform target)
     {
         Target = target;
+        Seeker.StartPath(transform.position, Target.position, OnPathComplete);
     }
 
     public void SetCastleTarget()
     {
         Target = enemyCastle;
+        Seeker.StartPath(transform.position, Target.position, OnPathComplete);
     }
+
+
+    public void OnPathComplete(Path p)
+    {
+        Debug.Log("A path was calculated. Did it fail with an error? " + p.error);
+
+        if (!p.error)
+        {
+            path = p;
+            // Reset the waypoint counter so that we start to move towards the first point in the path
+            currentWaypoint = 0;
+        }
+    }
+
+    public void Update() {
+
+        if (Health.currentHealth <= 0)
+        {
+            Die();
+        }
+
+        if (Target != null)
+        {
+            if (path == null)
+            {
+                // We have no path to follow yet, so don't do anything
+                return;
+            }
+
+            // Check in a loop if we are close enough to the current waypoint to switch to the next one.
+            // We do this in a loop because many waypoints might be close to each other and we may reach
+            // several of them in the same frame.
+            reachedEndOfPath = false;
+            // The distance to the next waypoint in the path
+            float distanceToWaypoint;
+            while (true)
+            {
+                // If you want maximum performance you can check the squared distance instead to get rid of a
+                // square root calculation. But that is outside the scope of this tutorial.
+                //Vector3 offset = transform.position - path.vectorPath[currentWaypoint];
+                distanceToWaypoint = Vector3.Distance(transform.position, path.vectorPath[currentWaypoint]);
+                if (distanceToWaypoint < nextWaypointDistance)
+                {
+                    // Check if there is another waypoint or if we have reached the end of the path
+                    if (currentWaypoint + 1 < path.vectorPath.Count)
+                    {
+                        currentWaypoint++;
+                    }
+                    else
+                    {
+                        // Set a status variable to indicate that the agent has reached the end of the path.
+                        // You can use this to trigger some special code if your game requires that.
+                        reachedEndOfPath = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            var speedFactor = reachedEndOfPath ? Mathf.Sqrt(distanceToWaypoint / nextWaypointDistance) : 1f;
+            Vector3 dir = (path.vectorPath[currentWaypoint] - transform.position).normalized;
+            Vector3 velocity = dir * speed * speedFactor;
+            CharController.SimpleMove(velocity);
+        }
+    }
+
+
+    
 
     public void Attack()
     {

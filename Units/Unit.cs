@@ -14,10 +14,10 @@ public abstract class Unit : MonoBehaviour
     protected int armor;
     public int attackRange;
     protected int attackSpeed;
-    protected int moveSpeed;
+    protected int speed;
     protected int attackDamage;
     protected int bounty;
-    protected int speed;
+    protected int moveSpeed;
 
     protected Health health;
     protected float healthRegeneration;

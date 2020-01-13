@@ -9,7 +9,6 @@ public class Footman : FighterAI
     private void Awake()
     {
         health = gameObject.GetComponent<Health>();
-        agent = gameObject.GetComponent<NavMeshAgent>();
         Init();
         health.currentHealth = health.maxHealth;
         InitializeStateMachine();
@@ -32,14 +31,5 @@ public class Footman : FighterAI
         attackType = new Normal();
         armorType = new Heavy();
         bounty = 2;
-    }
-
-
-    void Update()
-    {
-        if (health.currentHealth <= 0)
-        {
-            Die();
-        }
     }
 }

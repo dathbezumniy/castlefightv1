@@ -19,23 +19,23 @@ public class AttackState : BaseState
         if (chaseTarget != _fighter.Target)
         {
             _fighter.SetTarget(chaseTarget);
-            _fighter.agent.SetDestination(chaseTarget.transform.position);
             return typeof(ChaseState);
         }
 
-        if (!_fighter.agent.hasPath || _fighter.Target == null)
+        if (_fighter.Target == null)
         {
             return typeof(TargetCastleState);
         }
 
-        _fighter.agent.isStopped = true;
-        _attackReadyTimer -= Time.deltaTime;
-
-        if(_attackReadyTimer <= 0f)
+        if (_fighter.reachedEndOfPath)
         {
-            Debug.Log("Attack!");
-            _fighter.Attack();
-            _attackReadyTimer = 1.3f;
+            _attackReadyTimer -= Time.deltaTime;
+            if (_attackReadyTimer <= 0f)
+            {
+                Debug.Log("Attack!");
+                _fighter.Attack();
+                _attackReadyTimer = 1.3f;
+            }
         }
         return null;
     }

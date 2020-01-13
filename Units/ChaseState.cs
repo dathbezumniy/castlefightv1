@@ -14,13 +14,11 @@ public class ChaseState : BaseState
 
     public override Type Tick()
     {
-        _fighter.agent.isStopped = false;
         var chaseTarget = _fighter.CheckForAggro();
         if (chaseTarget != null)
         {
             _fighter.SetTarget(chaseTarget);
-            _fighter.agent.SetDestination(chaseTarget.transform.position);
-            if (_fighter.agent.remainingDistance <= _fighter.agent.stoppingDistance * _fighter.attackRange * 0.02f)
+            if (_fighter.reachedEndOfPath)
             {
                 return typeof(AttackState);
             }
@@ -30,6 +28,7 @@ public class ChaseState : BaseState
         {
             return typeof(TargetCastleState);
         }
+
         return null;
     }
 }

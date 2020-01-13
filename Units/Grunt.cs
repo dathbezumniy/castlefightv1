@@ -9,7 +9,6 @@ public class Grunt : FighterAI
     private void Awake()
     {
         health = gameObject.GetComponent<Health>();
-        agent = gameObject.GetComponent<NavMeshAgent>(); 
         Init();
         health.currentHealth = health.maxHealth;
         InitializeStateMachine();
@@ -32,14 +31,6 @@ public class Grunt : FighterAI
         attackType = new Normal();
         armorType = new Heavy();
         bounty = 2;
-    }
-
-    private void Update()
-    {
-        if (health.currentHealth <= 0)
-        {
-            Die();
-        }
     }
 }
 

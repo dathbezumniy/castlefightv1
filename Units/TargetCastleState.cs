@@ -30,17 +30,14 @@ public class TargetCastleState : BaseState
 
         // this should probably be a new state something like "AttackCastleState"
         //or "AttackBuildingState" since all fighters share similar building aggro mechanics
-        if (!_fighter.agent.pathPending)
+        if (_fighter.reachedEndOfPath)
         {
-            if (_fighter.agent.remainingDistance <= _fighter.agent.stoppingDistance * _fighter.attackRange * 0.02f)
+            _attackReadyTimer -= Time.deltaTime;
+            if (_attackReadyTimer <= 0f)
             {
-                _attackReadyTimer -= Time.deltaTime;
-                if (_attackReadyTimer <= 0f)
-                {
-                    Debug.Log("Attack!");
-                    _fighter.Attack();
-                    _attackReadyTimer = 1.3f;
-                }
+                Debug.Log("Attack!");
+                _fighter.Attack();
+                _attackReadyTimer = 1.3f;
             }
         }
             

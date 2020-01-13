@@ -47,7 +47,7 @@ public class Barracks : Building
 
     public override void SpawnUnit()
     {
-        currentSpawnUnit = Instantiate(SpawnUnitPrefab, new Vector3(transform.position.x + 1f, transform.position.y + 5f, transform.position.z + 1f), Quaternion.identity);
+        currentSpawnUnit = Instantiate(SpawnUnitPrefab, new Vector3(transform.position.x + 1f, transform.position.y, transform.position.z + 1f), Quaternion.identity);
         currentSpawnUnit.transform.SetParent(westTeamUnits);
         currentSpawnUnit = null;
     }
